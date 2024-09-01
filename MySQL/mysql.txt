@@ -1,0 +1,235 @@
+
+CREATE DATABASE ORG;
+USE ORG;
+
+CREATE TABLE Worker (
+	WORKER_ID INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
+	FIRST_NAME CHAR(25),
+	LAST_NAME CHAR(25),
+	SALARY INT(15),
+	JOINING_DATE DATETIME,
+	DEPARTMENT CHAR(25)
+);
+
+INSERT INTO Worker 
+	(WORKER_ID, FIRST_NAME, LAST_NAME, SALARY, JOINING_DATE, DEPARTMENT) VALUES
+		(001, 'Monika', 'Arora', 100000, '14-02-20 09.00.00', 'HR'),
+		(002, 'Niharika', 'Verma', 80000, '14-06-11 09.00.00', 'Admin'),
+		(003, 'Vishal', 'Singhal', 300000, '14-02-20 09.00.00', 'HR'),
+		(004, 'Amitabh', 'Singh', 500000, '14-02-20 09.00.00', 'Admin'),
+		(005, 'Vivek', 'Bhati', 500000, '14-06-11 09.00.00', 'Admin'),
+		(006, 'Vipul', 'Diwan', 200000, '14-06-11 09.00.00', 'Account'),
+		(007, 'Satish', 'Kumar', 75000, '14-01-20 09.00.00', 'Account'),
+		(008, 'Geetika', 'Chauhan', 90000, '14-04-11 09.00.00', 'Admin');
+        
+
+CREATE TABLE Bonus (
+	WORKER_REF_ID INT,
+	BONUS_AMOUNT INT(10),
+	BONUS_DATE DATETIME,
+	FOREIGN KEY (WORKER_REF_ID)
+		REFERENCES Worker(WORKER_ID)
+        ON DELETE CASCADE
+);
+
+INSERT INTO Bonus 
+	(WORKER_REF_ID, BONUS_AMOUNT, BONUS_DATE) VALUES
+		(001, 5000, '16-02-20'),
+		(002, 3000, '16-06-11'),
+		(003, 4000, '16-02-20'),
+		(001, 4500, '16-02-20'),
+		(002, 3500, '16-06-11');
+        show columns from BONUS;
+        show columns from Worker;
+        
+        select FIRST_NAME as WORKER_NAME from Worker;
+        
+        select upper(FIRST_NAME) from Worker;
+        
+        select distinct FIRST_NAME from Worker;
+        
+        select substring(FIRST_NAME,1,3)  from Worker;
+        
+        Select DISTINCT LENGTH(DEPARTMENT) from Worker;
+                
+        select concat(FIRST_NAME,'',LAST_NAME) as 'COMPLETE_NAME' from Worker;
+        
+        select * from Worker
+        order by FIRST_NAME,DEPARTMENT asc ;
+        
+        select * from Worker
+        order by DEPARTMENT DESC;
+        
+        select FIRST_NAME, DEPARTMENT from Worker
+        order by FIRST_NAME asc, DEPARTMENT desc;
+        
+        select * from Worker 
+        WHERE FIRST_NAME in ('Vipul', 'Satish') ;
+        
+        select * from Worker
+        where WORKER_ID not in (6,7);
+        
+        select * from Worker
+        where DEPARTMENT like ('Admin%');
+        
+        select * from Worker
+        where DEPARTMENT like ('%a%');
+        
+        select * from Worker
+        where DEPARTMENT like ('a___n');        
+        
+	    select * from Worker
+        where FIRST_NAME like ('_____h');
+        
+        select * from Worker
+        where SALARY between 100000 and 500000;
+        
+        select * from Worker
+        where
+        year(JOINING_DATE) = 2014
+        AND
+        MONTH (JOINING_DATE) = 2;
+        
+        select count(Department) from Worker;
+        
+        select count(*) FROM Worker
+        where DEPARTMENT = 'Admin';
+        
+        SELECT CONCAT(FIRST_NAME, ' ', LAST_NAME) As Worker_Name, Salary
+		FROM worker 
+        WHERE WORKER_ID IN 
+	    (SELECT WORKER_ID FROM worker 
+		WHERE Salary BETWEEN 50000 AND 100000);
+        
+SELECT DEPARTMENT, count(WORKER_ID) as No_Of_Workers 
+FROM worker 
+GROUP BY DEPARTMENT 
+ORDER BY No_Of_Workers DESC;
+
+CREATE TABLE Title (
+	WORKER_REF_ID INT,
+	WORKER_TITLE CHAR(25),
+	AFFECTED_FROM DATETIME,
+	FOREIGN KEY (WORKER_REF_ID)
+		REFERENCES Worker(WORKER_ID)
+        ON DELETE CASCADE
+);
+
+INSERT INTO Title 
+	(WORKER_REF_ID, WORKER_TITLE, AFFECTED_FROM) VALUES
+ (001, 'Manager', '2016-02-20 00:00:00'),
+ (002, 'Executive', '2016-06-11 00:00:00'),
+ (008, 'Executive', '2016-06-11 00:00:00'),
+ (005, 'Manager', '2016-06-11 00:00:00'),
+ (004, 'Asst. Manager', '2016-06-11 00:00:00'),
+ (007, 'Executive', '2016-06-11 00:00:00'),
+ (006, 'Lead', '2016-06-11 00:00:00'),
+ (003, 'Lead', '2016-06-11 00:00:00');
+
+SELECT Worker.FIRST_NAME, Title.WORKER_TITLE
+FROM Worker 
+INNER JOIN Title 
+ON Worker.WORKER_ID = Title.WORKER_REF_ID
+AND Title.WORKER_TITLE in ('Manager');
+
+SELECT WORKER_TITLE, AFFECTED_FROM, COUNT(*)
+FROM Title
+GROUP BY WORKER_TITLE, AFFECTED_FROM
+HAVING COUNT(*) > 1 ;
+        
+SELECT * FROM Worker WHERE MOD (WORKER_ID, 2) = 0 ;
+
+SELECT NOW();
+
+select * from worker
+where SALARY 
+order by SALARY desc
+limit 3;
+
+SELECT Salary
+FROM Worker W1
+WHERE 4 = (
+ SELECT COUNT( DISTINCT ( W2.Salary ) )
+ FROM Worker W2
+ WHERE W2.Salary >= W1.Salary
+ );
+
+select distinct W.WORKER_ID, W.FIRST_NAME, W.SALARY
+from Worker W, Worker W1
+where W.SALARY = W1.SALARY
+and W.WORKER_ID != W1.WORKER_ID;
+
+select max(SALARY) from Worker
+where SALARY not in(select max(SALARY) from Worker);
+
+select FIRST_NAME, DEPARTMENT from Worker
+where DEPARTMENT = 'HR'
+union all
+select FIRST_NAME, DEPARTMENT from Worker
+where DEPARTMENT = 'HR';
+
+Select * from Worker where WORKER_ID = (SELECT max(WORKER_ID) from Worker);
+
+select count(FIRST_NAME) , sum(SALARY) from Worker;
+
+select distinct FIRST_NAME,LAST_NAME,Bonus_AMOUNT
+from Worker,Bonus
+where Worker.WORKER_ID=Bonus.WORKER_REF_ID
+order by Bonus_Amount desc;
+
+update Worker set FIRST_NAME = ''
+where WORKER_ID =8 ;
+
+select * from worker;
+
+select  FIRST_NAME,LAST_NAME,Bonus_AMOUNT
+from Worker 
+left join Bonus  
+on Bonus.WORKER_REF_ID=Worker.WORKER_ID
+union
+select  FIRST_NAME,LAST_NAME,Bonus_AMOUNT
+from Worker 
+right join Bonus  
+on Bonus.WORKER_REF_ID=Worker.WORKER_ID
+
+
+create view WFL as
+select WORKER_ID,FIRST_NAME,LAST_NAME
+from worker;
+select * from Worker;
+
+SELECT distinct WORKER_ID,FIRST_NAME,LAST_NAME,Bonus_AMOUNT Bonus_DATE
+FROM Worker inner join Bonus
+on WORKER_ID=WORKER_REF_ID
+order by WORKER_ID ASC;
+
+SELECT WORKER_ID,FIRST_NAME
+FROM Worker
+WHERE EXISTS
+(SELECT FIRST_NAME FROM Worker WHERE WORKER_ID >3)
+ORDER BY WORKER_ID ASC;
+
+SELECT FIRST_NAME FROM Worker WHERE WORKER_ID >3;
+
+Delimiter 
+create procedure requiredS(in n varchar(50))
+Begin
+select *from Worker 
+where FIRST_NAME like n;
+End;
+Call requiredS ('m%');
+
+select * from Worker
+where FIRST_NAME like ('%a')
+and
+LAST_NAME like ('v%') ;
+
+select * from Worker
+whereJOINING_DATE like ('1_0')
+
+Alter Table Worker
+Add newColum varchar (50);
+
+select * from Worker
+
+
